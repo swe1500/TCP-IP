@@ -38,18 +38,19 @@ int main()
     }
 
     printf("======waiting for client's request======\n");
-    while(1){
     if( (connfd = accept(listenfd, (struct sockaddr*)NULL, NULL)) == -1){
         printf("accept socket error: %s(errno: %d)",strerror(errno),errno);
-        continue;
+        //continue;
     }
+    while(1){
+
     //n = recv(connfd, buff, MAXLINE, 0);
     n = read(connfd,&buff,sizeof(buff));
-    buff[n] = '\n';
-    buff[n+1] = '\0';
+    //buff[n] = '\n';
+    buff[n] = '\0';
     if( n > 0)
-    printf("recv msg from client: %s\n", buff);
-
+    //printf("recv msg from client: %s\n", buff);
+	printf("%s",buff);
     }
     close(connfd);
     close(listenfd);
