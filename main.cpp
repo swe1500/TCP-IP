@@ -1,21 +1,33 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-#include<errno.h>
+#include <stdio.h>
+#include <iostream>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 #include <unistd.h>
-#include<sys/types.h>
-#include<sys/socket.h>
-#include<netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
 
+using namespace std;
 
-#define MAXLINE 4096
+struct Data{
+    int ID;
+    float dist, angle, vel;
+};
 
 int main()
 {
     int    listenfd, connfd;
     struct sockaddr_in     servaddr;
-    char   buff[4096];
+    char   buff[16];
     int    n;
+//    int ID;
+//    float dist ,angle ,vel;
+    vector<Data> RadarDataTable;
 
     if( (listenfd = socket(AF_INET, SOCK_STREAM, 0)) == -1 ){
     printf("create socket error: %s(errno: %d)\n",strerror(errno),errno);
@@ -40,17 +52,19 @@ int main()
     printf("======waiting for client's request======\n");
     if( (connfd = accept(listenfd, (struct sockaddr*)NULL, NULL)) == -1){
         printf("accept socket error: %s(errno: %d)",strerror(errno),errno);
-        //continue;
     }
     while(1){
-
-    //n = recv(connfd, buff, MAXLINE, 0);
+    Data data;
     n = read(connfd,&buff,sizeof(buff));
-    //buff[n] = '\n';
-    buff[n] = '\0';
-    if( n > 0)
-    //printf("recv msg from client: %s\n", buff);
-	printf("%s",buff);
+    memcpy(&data.ID, buff, 4);
+    memcpy(&data.dist, buff+4, 4);
+    memcpy(&data.angle, buff+8, 4);
+    memcpy(&data.vel, buff+12, 4);
+    if(data.ID == 1)
+        RadarDataTable.clear();
+    RadarDataTable.push_back(data);
+
+
     }
     close(connfd);
     close(listenfd);

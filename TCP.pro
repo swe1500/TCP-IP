@@ -4,5 +4,5 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-    transmit.cpp
+    main.cpp
 

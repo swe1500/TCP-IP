@@ -30,10 +30,15 @@ void CopyString(char* sendline, string str){
 int main(int argc, char** argv)
 {
     int    sockfd, n;
-    int a = 4321;
-    char    recvline[4096], sendline[4096];
+    int ID = 1;
+    float dist = 123.123;
+    float angle = -2.12;
+    float vel = 9.543;
+    char  sendline[16];
     struct sockaddr_in    servaddr;
-    string str = Num2String(a);
+   // string str = Num2String(a) + ",";
+//	str += Num2String(b) + ",";
+//	str += Num2String(c);
 
     if( argc != 2){
     printf("usage: ./client <ipaddress>\n");
@@ -60,10 +65,29 @@ int main(int argc, char** argv)
 
     //printf("send msg to server: \n");
     //fgets(sendline, 4096, stdin);
-
+	int i = 0;
     while(1){
-	CopyString(sendline, str);
-        send(sockfd,sendline,str.size()+1,0);
+	if(i < 4){
+	   ID += 1;
+	   dist += 1;
+	   angle += 1;
+	   vel += 1;
+	   i++;
+	}
+	else{
+	   ID -= 4;
+	   dist -= 4;
+	   angle -= 4;
+	   vel -= 4;
+	   i = 0;
+	}
+
+	memcpy(sendline, &ID, 4);
+	memcpy(sendline+4, &dist, 4);
+	memcpy(sendline+8, &angle, 4);
+	memcpy(sendline+12, &vel, 4);
+	//CopyString(sendline, str);
+        send(sockfd,sendline,16,0);
         //printf("1212\n");
     }
     /****
