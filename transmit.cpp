@@ -31,8 +31,8 @@ int main(int argc, char** argv)
 {
     int    sockfd, n;
     int ID = 1;
-    float dist = 123.123;
-    float angle = -2.12;
+    float dist = 13.123;
+    float angle = -20.12;
     float vel = 9.543;
     char  sendline[16];
     struct sockaddr_in    servaddr;
@@ -70,14 +70,14 @@ int main(int argc, char** argv)
 	if(i < 4){
 	   ID += 1;
 	   dist += 1;
-	   angle += 1;
+	   angle += 8;
 	   vel += 1;
 	   i++;
 	}
 	else{
 	   ID -= 4;
-	   dist -= 4;
-	   angle -= 4;
+	   dist += 1;
+	   angle -= 32;
 	   vel -= 4;
 	   i = 0;
 	}

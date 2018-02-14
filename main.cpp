@@ -19,15 +19,22 @@ struct Data{
     float dist, angle, vel;
 };
 
-int main()
-{
+
+class CanReceiver{
+private:
     int    listenfd, connfd;
     struct sockaddr_in     servaddr;
     char   buff[16];
     int    n;
-//    int ID;
-//    float dist ,angle ,vel;
-    vector<Data> RadarDataTable;
+
+public:
+    CanReceiver();
+    void ReceiveMessage(vector<Data> &RadarDataTable, Data& temp);
+    ~CanReceiver();
+};
+
+
+CanReceiver::CanReceiver(){
 
     if( (listenfd = socket(AF_INET, SOCK_STREAM, 0)) == -1 ){
     printf("create socket error: %s(errno: %d)\n",strerror(errno),errno);
@@ -53,6 +60,11 @@ int main()
     if( (connfd = accept(listenfd, (struct sockaddr*)NULL, NULL)) == -1){
         printf("accept socket error: %s(errno: %d)",strerror(errno),errno);
     }
+}
+
+void CanReceiver::ReceiveMessage(vector<Data> &RadarDataTable, Data& temp){
+    RadarDataTable.clear();
+    if(temp.ID == 1) RadarDataTable.push_back(temp);
     while(1){
     Data data;
     n = read(connfd,&buff,sizeof(buff));
@@ -60,12 +72,38 @@ int main()
     memcpy(&data.dist, buff+4, 4);
     memcpy(&data.angle, buff+8, 4);
     memcpy(&data.vel, buff+12, 4);
-    if(data.ID == 1)
-        RadarDataTable.clear();
-    RadarDataTable.push_back(data);
-
-
+    /******
+    if(data.ID == 1){
+	    for(int i = 0; i < RadarDataTable.size(); i++)
+	printf("ID: %d Dist: %f Angle: %f Vel: %f\n",RadarDataTable[i].ID, RadarDataTable[i].dist, RadarDataTable[i].angle, RadarDataTable[i].vel);
+	RadarDataTable.clear();
+	//RadarDataTable.push_back(data);
+	//return;
     }
+    *******/
+    RadarDataTable.push_back(data);
+    if(data.ID == 1 && RadarDataTable.size() > 0){
+            temp = data;
+            RadarDataTable.pop_back();
+            return;
+        }
+    }
+}
+
+CanReceiver::~CanReceiver(){
+
     close(connfd);
     close(listenfd);
+}
+
+int main()
+{
+    CanReceiver can;
+    vector<Data> RadarDataTable;
+    Data temp;
+    while(1){
+    can.ReceiveMessage(RadarDataTable, temp);
+    for(int i = 0; i < RadarDataTable.size(); i++)
+        printf("ID: %d Dist: %f Angle: %f Vel: %f\n",RadarDataTable[i].ID, RadarDataTable[i].dist, RadarDataTable[i].angle, RadarDataTable[i].vel);
+	}
 }
